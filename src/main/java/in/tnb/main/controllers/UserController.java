@@ -26,7 +26,7 @@ public class UserController {
 		return "Welome";
 	}
 	
-	@GetMapping("/users")
+	@GetMapping("/api/users")
 	public List<User> getAllUsers()
 	{
 		return repo.findAll();
