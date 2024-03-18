@@ -12,5 +12,7 @@ public interface UserRepo extends JpaRepository<User, Integer>{
 	
 	@Query("Select u from User u where u.firstname LIKE %:query% OR u.lastname LIKE %:query% ")//OR u.useremail LIKE %:query% to search by email
 	List<User> searchUser(@Param("query") String keyword);
+	
+	User findByUseremail(String useremail);
 
 }

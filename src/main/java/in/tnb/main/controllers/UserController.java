@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,19 +16,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import in.tnb.main.models.User;
 import in.tnb.main.repository.UserRepo;
+import in.tnb.main.securityconfig.JwtProvider;
 
 @RestController
 public class UserController {
 	
 	@Autowired
 	UserRepo repo;
-	@GetMapping("/")
+	@GetMapping("/api")
 	public String openIndex()
 	{
 		return "Welome";
 	}
 	
-	@GetMapping("/api/users")
+	@GetMapping("/users")
 	public List<User> getAllUsers()
 	{
 		return repo.findAll();
@@ -37,7 +40,7 @@ public class UserController {
 		return repo.searchUser(keyword);
 	}
 	
-	@GetMapping("/users/{userid}")
+	@GetMapping("/api/users/{userid}")
 	public User findUserByUserId(@PathVariable("userid") int id) throws Exception
 	{
 		Optional<User> user=repo.findById(id);
@@ -49,10 +52,21 @@ public class UserController {
 		throw new Exception("User not found with userid "+id);
 	}
 	
-	@PostMapping("/save")
-	public User saveUser(@RequestBody User user)
+	@PostMapping("/createuser")
+	public AuthResponse saveUser(@RequestBody User user) throws Exception
 	{
-		return repo.save(user);
+		User exist_user=repo.findByUseremail(user.getUseremail());
+		
+		if(exist_user!=null)
+		{
+			throw new Exception("This email is already used with another accound ");
+		}
+		
+		User created_user=repo.save(user);
+		
+		Authentication authentication=new UsernamePasswordAuthenticationToken(created_user.getUseremail(),created_user.getUserpassword());
+		String jwt=JwtProvider.generateToken(authentication);
+		return new AuthResponse("User created successfully", jwt);
 	
 	}
 	
