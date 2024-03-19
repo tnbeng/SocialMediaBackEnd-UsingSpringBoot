@@ -21,6 +21,9 @@ public class Post {
 	private String caption;
 	private LocalDateTime createtime;
 	
+	@OneToMany
+	private List<Comment> comments=new ArrayList<>();
+	
 	@ManyToOne
 	private User user;
 	
@@ -82,6 +85,15 @@ public class Post {
 	public void setCreatetime(LocalDateTime createtime) {
 		this.createtime = createtime;
 	}
+
+	public List<Comment> getComments() {
+		return comments;
+	}
+
+	public void setComments(List<Comment> comments) {
+		this.comments = comments;
+	}
+	
 	
 
 }

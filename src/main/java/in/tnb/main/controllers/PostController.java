@@ -44,7 +44,7 @@ public class PostController {
 		return new ResponseEntity<ApiResponse>(res,HttpStatus.OK);
 	}
 	
-	@GetMapping("/findPosts/{postid}")
+	@GetMapping("/posts/{postid}")
 	public ResponseEntity<Post> findPostByPostId(@PathVariable int postid) throws Exception
 	{
 		Post post=postService.findPostByPostId(postid);
@@ -59,7 +59,7 @@ public class PostController {
 		return new ResponseEntity<List<Post>>(posts,HttpStatus.OK);
 	}
 	//This should be for admin only
-	@GetMapping("/findPosts")
+	@GetMapping("/posts")
 	public ResponseEntity<List<Post>> findAllPost() throws Exception
 	{
 		List<Post> posts=postService.findAllPost();

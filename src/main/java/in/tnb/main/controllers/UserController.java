@@ -60,13 +60,13 @@ public class UserController {
 		return userService.deleteUser(exist_user.getUserid());
 	}
 	//This should be for admin only
-	@GetMapping("/secure/users")
+	@GetMapping("/users")
 	public List<User> findAllUsers()
 	{
 		return userService.findAllUser();
 	}
  	//This should be for admin only
-	@GetMapping("/secure/users/{userid}")
+	@GetMapping("/users/{userid}")
 	public User findUserByUserId(@PathVariable("userid") int id) throws Exception
 	{
 		return userService.findUserByUserId(id);
