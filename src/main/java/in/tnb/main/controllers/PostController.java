@@ -11,62 +11,74 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import in.tnb.main.models.Post;
+import in.tnb.main.models.User;
 import in.tnb.main.response.ApiResponse;
 import in.tnb.main.services.PostService;
+import in.tnb.main.services.UserService;
 
 @RestController
 public class PostController {
 
 	@Autowired
 	PostService postService;
+	@Autowired
+    UserService userService;
 	
-	@PostMapping("/createpost/{userid}")
-	public ResponseEntity<Post> createPost(@RequestBody Post post,@PathVariable("userid")int userid) throws Exception
+	@PostMapping("/createPost")
+	public ResponseEntity<Post> createPost(@RequestBody Post post,@RequestHeader("Authorization") String jwt) throws Exception
 	{
-		Post created_post=postService.createNewPost(post,userid);
+		User reg_user=userService.findUserFromToken(jwt);
+		Post created_post=postService.createNewPost(post,reg_user.getUserid());
 		return new ResponseEntity<>(created_post,HttpStatus.ACCEPTED);
 	}
-	@DeleteMapping("/deletepost/post/{postid}/user/{userid}")
-	public ResponseEntity<ApiResponse> deletePost(@PathVariable int postid,@PathVariable int userid) throws Exception
+	@DeleteMapping("/deletePost/post/{postid}")
+	public ResponseEntity<ApiResponse> deletePost(@PathVariable int postid,@RequestHeader("Authorization") String jwt) throws Exception
 	{
-		String message=postService.deletePost(postid, userid);
+		User reg_user=userService.findUserFromToken(jwt);
+		String message=postService.deletePost(postid, reg_user.getUserid());
 		ApiResponse res=new ApiResponse(message,true);
 		return new ResponseEntity<ApiResponse>(res,HttpStatus.OK);
 	}
 	
-	@GetMapping("/findposts/{postid}")
+	@GetMapping("/findPosts/{postid}")
 	public ResponseEntity<Post> findPostByPostId(@PathVariable int postid) throws Exception
 	{
 		Post post=postService.findPostByPostId(postid);
 		return new ResponseEntity<Post>(post,HttpStatus.ACCEPTED);
 	}
 	
-	@GetMapping("/userposts/user/{userid}")
-	public ResponseEntity<List<Post>> findUsersPost(@PathVariable int userid)
+	@GetMapping("/userPosts")
+	public ResponseEntity<List<Post>> findUsersPost(@RequestHeader("Authorization") String jwt)
 	{
-		List<Post> posts=postService.findPostByUserId(userid);
+		User reg_user=userService.findUserFromToken(jwt);
+		List<Post> posts=postService.findPostByUserId(reg_user.getUserid());
 		return new ResponseEntity<List<Post>>(posts,HttpStatus.OK);
 	}
-	@GetMapping("/findposts")
+	//This should be for admin only
+	@GetMapping("/findPosts")
 	public ResponseEntity<List<Post>> findAllPost() throws Exception
 	{
 		List<Post> posts=postService.findAllPost();
 		return new ResponseEntity<List<Post>>(posts,HttpStatus.OK);
 	}
 	
-	@PutMapping("/savepost/post/{postid}/user/{userid}")
-	public ResponseEntity<Post> savedPost(@PathVariable int postid,@PathVariable int userid) throws Exception
+	@PutMapping("/createPost/post/{postid}")
+	public ResponseEntity<Post> savedPost(@PathVariable int postid,@RequestHeader("Authorization") String jwt) throws Exception
 	{
-		Post post=postService.savedPost(postid, userid);
+		User reg_user=userService.findUserFromToken(jwt);
+		Post post=postService.savedPost(postid,reg_user.getUserid());
 		return new ResponseEntity<Post>(post,HttpStatus.ACCEPTED);
 	}
-	@PutMapping("/likepost/post/{postid}/user/{userid}")
-	public ResponseEntity<Post> likePost(@PathVariable int postid,@PathVariable int userid) throws Exception
+	@PutMapping("/likePost/post/{postid}")
+	public ResponseEntity<Post> likePost(@PathVariable int postid,@RequestHeader("Authorization") String jwt) throws Exception
 	{
-		Post post=postService.likePost(postid, userid);
+		User reg_user=userService.findUserFromToken(jwt);
+		
+		Post post=postService.likePost(postid,reg_user.getUserid());
 		return new ResponseEntity<Post>(post,HttpStatus.ACCEPTED);
 	}
 	

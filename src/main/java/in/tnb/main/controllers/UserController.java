@@ -1,112 +1,92 @@
 package in.tnb.main.controllers;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import in.tnb.main.models.User;
 import in.tnb.main.repository.UserRepo;
-import in.tnb.main.securityconfig.JwtProvider;
+import in.tnb.main.services.UserService;
 
 @RestController
 public class UserController {
 	
 	@Autowired
 	UserRepo repo;
-	@GetMapping("/api")
+	@Autowired
+	UserService userService;
+	
+	@GetMapping("/")
 	public String openIndex()
 	{
 		return "Welome";
 	}
 	
-	@GetMapping("/users")
-	public List<User> getAllUsers()
+	@PostMapping("/login")
+	public AuthResponse loginUser(@RequestParam("email") String email,@RequestParam("password") String password) throws Exception
 	{
-		return repo.findAll();
+		
+       return userService.loginUser(email, password);
 	}
-	@GetMapping("/users/search/{key}")
-	public List<User> searchUserByKeyword(@PathVariable("key") String keyword)
+	@PostMapping("/register")
+	public AuthResponse createUser(@RequestBody User user) throws Exception
 	{
-		return repo.searchUser(keyword);
+		return userService.createUser(user);
+	}
+
+	
+	@PutMapping("/secure/updateUser")
+	public User updateUser(@RequestBody User user,@RequestHeader("Authorization") String jwt) throws Exception
+	{
+		User exist_user=userService.findUserFromToken(jwt);
+
+		return userService.updateUser(user, exist_user);
+		
 	}
 	
-	@GetMapping("/api/users/{userid}")
+	@DeleteMapping("/secure/deleteUser")
+	public String deleteUser(@RequestHeader("Authorization") String jwt)
+	{
+		User exist_user=userService.findUserFromToken(jwt);
+		return userService.deleteUser(exist_user.getUserid());
+	}
+	//This should be for admin only
+	@GetMapping("/secure/users")
+	public List<User> findAllUsers()
+	{
+		return userService.findAllUser();
+	}
+ 	//This should be for admin only
+	@GetMapping("/secure/users/{userid}")
 	public User findUserByUserId(@PathVariable("userid") int id) throws Exception
 	{
-		Optional<User> user=repo.findById(id);
-		
-		if(user.isPresent())
-		{
-			return user.get();
-		}
-		throw new Exception("User not found with userid "+id);
+		return userService.findUserByUserId(id);
 	}
 	
-	@PostMapping("/createuser")
-	public AuthResponse saveUser(@RequestBody User user) throws Exception
+	@GetMapping("/secure/users/search/{key}")
+	public List<User> searchUserByKeyword(@PathVariable("key") String keyword)
 	{
-		User exist_user=repo.findByUseremail(user.getUseremail());
-		
-		if(exist_user!=null)
-		{
-			throw new Exception("This email is already used with another accound ");
-		}
-		
-		User created_user=repo.save(user);
-		
-		Authentication authentication=new UsernamePasswordAuthenticationToken(created_user.getUseremail(),created_user.getUserpassword());
-		String jwt=JwtProvider.generateToken(authentication);
-		return new AuthResponse("User created successfully", jwt);
-	
+		return userService.searchUserByKeyword(keyword);
 	}
 	
-	@PutMapping("/update/{userid}")
-	public User updateUser(@RequestBody User user,@PathVariable("userid") int id) throws Exception
-	{
-		Optional<User> user_ref=repo.findById(id);
-		if(user_ref.isEmpty())
-		{
-			throw new Exception("User not found with userid "+id);
-		}
-		User exist_user=user_ref.get();
-		
-		if(user.getFirstname()!=null)
-		{
-			exist_user.setFirstname(user.getFirstname());
-		}
-		if(user.getLastname()!=null)
-		{
-			exist_user.setLastname(user.getLastname());
-		}
-		if(user.getUseremail()!=null)
-		{
-			exist_user.setUseremail(user.getUseremail());
-		}
-		if(user.getUserpassword()!=null)
-		{
-			exist_user.setUserpassword(user.getUserpassword());
-		}
-		
-		
-		return repo.save(exist_user);
-		
-	}
 	
-	@DeleteMapping("/delete/{userid}")
-	public String deleteUser(@PathVariable("userid") int id)
+	@GetMapping("/secure/followUser/{userid}")
+	public User followUser(@RequestHeader("Authorization") String jwt,@PathVariable("userid") int id) throws Exception
 	{
-		repo.deleteById(id);
-		return "User deleted successfully with userid"+id;
+		User user1=userService.findUserFromToken(jwt);
+	    User user2=userService.findUserByUserId(id);
+	    User following_usre=userService.followUser(user1, user2);
+	    
+	    return following_usre;
 	}
 	
 }
