@@ -26,7 +26,7 @@ public class CommentController {
 	@Autowired
 	UserService userService;
 	
-	@PostMapping("/secure/doComment/post/{postid}")
+	@PostMapping("/secure/commnets/post/{postid}")
 	public Comment createComment(@RequestBody Comment comment,@PathVariable("postid") int postid,@RequestHeader("Authorization") String jwt) throws Exception
 	{
 		User user=userService.findUserFromToken(jwt);

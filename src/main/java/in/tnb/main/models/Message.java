@@ -15,9 +15,9 @@ import jakarta.persistence.ManyToOne;
 public class Message {
      
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
-	private String message_content;
+	private String content;
 	private String image;
 	private LocalDateTime timestamp;
 	
@@ -37,11 +37,11 @@ public class Message {
 	}
 
 	public String getMessage_content() {
-		return message_content;
+		return content;
 	}
 
 	public void setMessage_content(String message_content) {
-		this.message_content = message_content;
+		this.content = message_content;
 	}
 
 	public String getImage() {

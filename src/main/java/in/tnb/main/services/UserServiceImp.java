@@ -66,14 +66,14 @@ public class UserServiceImp implements UserService {
 	}
 	@Override
 	public AuthResponse loginUser(String email,String password) throws Exception {
-        
+        System.out.println("Email "+email+" Password "+password);
 		UserDetails userDetails=userDetailsService.loadUserByUsername(email);
 		
 		if(passwordEncoder.matches(password, userDetails.getPassword()))
 		{
 		  Authentication authentication=new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
 		  String jwt=JwtProvider.generateToken(authentication);
-		  
+		  System.out.println("Jwt "+jwt);
 		 return new AuthResponse("Login success",jwt);
 		}
 		else

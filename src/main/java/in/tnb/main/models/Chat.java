@@ -13,7 +13,7 @@ import jakarta.persistence.ManyToMany;
 @Entity
 public class Chat {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 	private String chat_name;
     private String chat_image;

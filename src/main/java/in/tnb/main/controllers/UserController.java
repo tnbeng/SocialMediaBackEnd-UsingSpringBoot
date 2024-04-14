@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import in.tnb.main.models.LoginData;
 import in.tnb.main.models.User;
 import in.tnb.main.repository.UserRepo;
 import in.tnb.main.services.UserService;
@@ -30,14 +31,20 @@ public class UserController {
 	{
 		return "Welome";
 	}
-	
-	@PostMapping("/login")
-	public AuthResponse loginUser(@RequestParam("email") String email,@RequestParam("password") String password) throws Exception
+	@GetMapping("/secure")
+	public String check()
 	{
-		
-       return userService.loginUser(email, password);
+		return "Welome after cheking jwt";
 	}
-	@PostMapping("/register")
+	
+	@PostMapping("/signin")
+	public AuthResponse loginUser(@RequestBody LoginData loginData) throws Exception
+	{
+		System.out.println("User password "+loginData.getUserpassword());
+		System.out.println("User email "+loginData.getUseremail());
+       return userService.loginUser(loginData.getUseremail(), loginData.getUserpassword());
+	}
+	@PostMapping("/signup")
 	public AuthResponse createUser(@RequestBody User user) throws Exception
 	{
 		return userService.createUser(user);
@@ -66,10 +73,11 @@ public class UserController {
 		return userService.findAllUser();
 	}
  	//This should be for admin only
-	@GetMapping("/users/{userid}")
-	public User findUserByUserId(@PathVariable("userid") int id) throws Exception
-	{
-		return userService.findUserByUserId(id);
+	@GetMapping("/secure/users/profile")
+	public User findUserByUserId(@RequestHeader("Authorization") String jwt) throws Exception
+	{   
+		User user=userService.findUserFromToken(jwt);
+		return userService.findUserByUserId(user.getUserid());
 	}
 	
 	@GetMapping("/secure/users/search/{key}")

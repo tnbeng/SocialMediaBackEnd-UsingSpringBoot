@@ -27,7 +27,7 @@ public class UserDetailsServiceImple implements UserDetailsService {
 		}
 		
 		UserDetails user=User//.withUsername("anything")//we can give anything here it does not matter just we have to user Withusername()function because password comes after username 
-				             //We basically find user by username and extract userpassword and set it to password field of inbuild User Class and apring security matches it's set password  with entered password
+				             //We basically find user by username and extract userpassword and set it to password field of inbuild User Class and spring security matches it's set password  with entered password
 				             .withUsername(exsit_user.getUseremail())
 				             .password(exsit_user.getUserpassword())
 				             .build();

@@ -28,7 +28,7 @@ public class PostController {
 	@Autowired
     UserService userService;
 	
-	@PostMapping("/createPost")
+	@PostMapping("/secure/posts")
 	public ResponseEntity<Post> createPost(@RequestBody Post post,@RequestHeader("Authorization") String jwt) throws Exception
 	{
 		User reg_user=userService.findUserFromToken(jwt);
@@ -73,7 +73,7 @@ public class PostController {
 		Post post=postService.savedPost(postid,reg_user.getUserid());
 		return new ResponseEntity<Post>(post,HttpStatus.ACCEPTED);
 	}
-	@PutMapping("/likePost/post/{postid}")
+	@PutMapping("/secure/posts/like/{postid}")
 	public ResponseEntity<Post> likePost(@PathVariable int postid,@RequestHeader("Authorization") String jwt) throws Exception
 	{
 		User reg_user=userService.findUserFromToken(jwt);

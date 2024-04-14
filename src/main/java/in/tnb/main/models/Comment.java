@@ -14,7 +14,7 @@ import jakarta.persistence.ManyToOne;
 @Entity
 public class Comment {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
     private String content; 
     private LocalDateTime created_time;
